@@ -1,0 +1,20 @@
+##########################################################################################
+# Downsized dev-config in favour of default_config (which loads loads of stuff)
+##########################################################################################
+
+# load basic UI and features
+frontend:
+config:
+
+# load the component under dev:
+dell_printer:
+
+# logging (debug component under dev) component:
+logger:
+  default: info
+  logs:
+    custom_components.dell_printer: debug
+
+# make user creation on startup possible
+person:
+auth:
