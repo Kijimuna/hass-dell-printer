@@ -6,9 +6,6 @@
 frontend:
 config:
 
-# load the component under dev:
-dell_printer:
-
 # logging (debug component under dev) component:
 logger:
   default: info
