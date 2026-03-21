@@ -2,8 +2,8 @@ from typing import Callable, Any, Dict
 from custom_components.dell_printer import DellDataUpdateCoordinator, DellPrinterEntity
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.helpers.entity import EntityCategory
-from homeassistant.helpers.typing import HomeAssistantType
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.util import slugify
 
 import logging
@@ -13,7 +13,7 @@ from .const import *
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry, async_add_entities: Callable):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: Callable):
     """Setup binary sensor entity."""
 
     _LOGGER.debug(f"async_setup_entry called")
