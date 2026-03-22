@@ -10,7 +10,7 @@ from .const import *
 
 from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_HOST, CONF_SCAN_INTERVAL
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
 
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, CoordinatorEntity, UpdateFailed
@@ -27,20 +27,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     host = entry.data[CONF_HOST]
 
     # setup the parser
-    update_interval = entry.data[CONF_SCAN_INTERVAL]
+    update_interval = entry.data.get(CONF_SCAN_INTERVAL, POLLING_INTERVAL)
     session = async_get_clientsession(hass)
-    printer = DellPrinterParser(session, host)    
-    try:
-        await printer.load_data()
-    except ClientConnectorError as e:
-        _LOGGER.error(f"Cannot load data with error: {e}")
-        return False
+    printer = DellPrinterParser(session, host)
 
     # setup a coordinator
     coordinator = DellDataUpdateCoordinator(hass, _LOGGER, printer, timedelta(seconds=update_interval))
 
     # refresh coordinator for the first time to load initial data
-    await coordinator.async_config_entry_first_refresh()
+    try:
+        await coordinator.async_config_entry_first_refresh()
+    except ConfigEntryNotReady:
+        _LOGGER.debug("Printer at %s is currently unavailable, will retry setup", host)
+        raise
     
     # store coordinator
     hass.data.setdefault(DOMAIN, {})
@@ -78,7 +77,7 @@ class DellDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             """Ask the library to reload fresh data."""
             await self.printer.load_data()
-        except (ConnectionError) as error:
+        except (ConnectionError, ClientConnectorError) as error:
             raise UpdateFailed(error) from error
 
         """Stick the data into a dictionary and return this for further usage."""
