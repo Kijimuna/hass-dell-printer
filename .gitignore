@@ -1,2 +1,14 @@
 __pycache__
 .idea
+
+.cache/
+.storage/
+blueprints/
+.ha_run.lock
+.HA_VERSION
+home-assistant.log*
+
+.devcontainer/
+configuration.yaml
+
+.env
